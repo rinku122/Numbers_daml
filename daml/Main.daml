@@ -1,0 +1,70 @@
+module Main where
+
+import Daml.Script
+import DA.Math
+
+type CoputationId = ContractId Coputation
+
+
+template Coputation
+  with
+    author : Party
+    value : Int   --Int stores signed 64 bit integers like 123 or -123
+    addByOne : Int
+    subtractByOne : Int
+    multiplyByTwo : Int
+    diveideByThree : Int
+    diveideBySeven : Int
+    modulusOfFive : Int
+    powerOfTwo : Decimal -- Stores fixed point number witj 28 digits before and 10 digits after the decimal
+    squareRootOf : Decimal
+  where
+    signatory author
+    choice Calculate : CoputationId
+      with
+        valueToTest : Int    
+      controller author
+      do create this with
+          value = valueToTest
+          addByOne = valueToTest + 1
+          subtractByOne = valueToTest - 1
+          multiplyByTwo = valueToTest * 2
+          diveideByThree = valueToTest / 3
+          diveideBySeven = valueToTest / 7 --Returns Qutioent
+          modulusOfFive = valueToTest % 5  --Returns Remainder
+          powerOfTwo = (intToDecimal valueToTest) ** 2.0
+          squareRootOf = sqrt (intToDecimal valueToTest)
+
+
+setup : Script CoputationId
+
+setup = script do
+-- user_setup_begin
+  rajesh <- allocatePartyWithHint "Rajesh" (PartyIdHint "Rajesh")
+  
+  rajeshId <- validateUserId "rajesh"
+  createUser (User rajeshId (Some rajesh)) [CanActAs rajesh]
+
+  -- Ethan makes a proposal 
+  calculateion0 <- submit rajesh do
+    createCmd Coputation 
+      with
+        author = rajesh
+        value = 0
+        addByOne = 0
+        subtractByOne = 0
+        multiplyByTwo = 0
+        diveideByThree = 0
+        diveideBySeven = 0
+        modulusOfFive = 0
+        powerOfTwo = 0.0
+        squareRootOf = 0.0
+
+  submit rajesh do
+    exerciseCmd  calculateion0 Calculate with valueToTest = 12
+
+          
+            
+          
+        
+    
